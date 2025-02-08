@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<!-- saved from url=(0130)https://lutra.ai/user-content-api/workflows/fHbATcsec54/runs/0194e2dd-f022-29e9-2007-d16d812616d5/action_calls.save_file/0/arg_raw -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>La Llama Che: Revolution Game</title>
+        <style>
+            body {
+                background: #1a1a1a;
+                margin: 0;
+                padding: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                font-family: 'Courier New', monospace;
+            }
+            
+            #gameContainer {
+                position: relative;
+                width: 800px;
+                height: 600px;
+                background: #000;
+                overflow: hidden;
+                border: 2px solid #ff4757;
+            }
+            
+            #llamaChe {
+                position: absolute;
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                user-select: none;
+            }
+            
+            .enemy {
+                position: absolute;
+                font-size: 24px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: rgba(255, 71, 87, 0.2);
+                padding: 10px;
+                border-radius: 5px;
+                animation: float 2s infinite alternate;
+            }
+            
+            .projectile {
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                background: #2ed573;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 14px;
+            }
+            
+            #score {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                color: #2ed573;
+                font-size: 24px;
+            }
+            
+            #health {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                color: #ff4757;
+                font-size: 24px;
+            }
+            
+            @keyframes float {
+                from { transform: translateY(0); }
+                to { transform: translateY(20px); }
+            }
+            
+            .enemy-text {
+                font-size: 12px;
+                color: #fff;
+                text-align: center;
+            }
+            
+            .explosion {
+                position: absolute;
+                font-size: 40px;
+                animation: explode 0.5s forwards;
+                pointer-events: none;
+            }
+            
+            @keyframes explode {
+                0% { transform: scale(1); opacity: 1; }
+                100% { transform: scale(2); opacity: 0; }
+            }
+            
+            #gameOver {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #ff4757;
+                font-size: 48px;
+                display: none;
+                text-align: center;
+            }
+            
+            #startScreen {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                color: #2ed573;
+            }
+            
+            .start-button {
+                padding: 15px 30px;
+                font-size: 24px;
+                background: #2ed573;
+                color: #000;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 20px;
+            }
+        
+            .pixel-border {
+                box-shadow: 0 0 10px #2ed573, 
+                           inset 0 0 20px rgba(46, 213, 115, 0.5);
+            }
+            
+            #llamaChe {
+                transition: transform 0.2s ease;
+                animation: hover 2s infinite ease-in-out;
+            }
+            
+            @keyframes hover {
+                0%, 100% { transform: translateY(0) rotate(0deg); }
+                50% { transform: translateY(-5px) rotate(5deg); }
+            }
+            
+            .enemy {
+                transition: transform 0.3s ease;
+                animation: float 3s infinite alternate-reverse ease-in-out;
+                box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+            }
+            
+            .projectile {
+                filter: drop-shadow(0 0 5px #2ed573);
+                animation: spin 1s linear infinite;
+            }
+            
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            
+            .power-up {
+                position: absolute;
+                font-size: 24px;
+                animation: pulse 1s infinite ease-in-out;
+            }
+            
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.2); }
+                100% { transform: scale(1); }
+            }
+            
+            #score, #health {
+                text-shadow: 0 0 5px currentColor;
+                font-weight: bold;
+            }
+            
+            .combo-text {
+                position: absolute;
+                color: #2ed573;
+                font-size: 20px;
+                animation: float-up 1s forwards;
+                pointer-events: none;
+            }
+            
+            @keyframes float-up {
+                0% { transform: translateY(0); opacity: 1; }
+                100% { transform: translateY(-50px); opacity: 0; }
+            }
+            
+            #startScreen, #gameOver {
+                background: rgba(0, 0, 0, 0.9);
+                backdrop-filter: blur(5px);
+            }
+            
+            .start-button {
+                transition: all 0.3s ease;
+                box-shadow: 0 0 10px #2ed573;
+            }
+            
+            .start-button:hover {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px #2ed573;
+            }
+            
+            #powerMeter {
+                position: absolute;
+                bottom: 20px;
+                left: 20px;
+                width: 100px;
+                height: 10px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 5px;
+                overflow: hidden;
+            }
+            
+            #powerFill {
+                width: 0%;
+                height: 100%;
+                background: #2ed573;
+                transition: width 0.3s ease;
+            }
+            
+            .level-indicator {
+                position: absolute;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: #a537fd;
+                font-size: 20px;
+                text-shadow: 0 0 5px currentColor;
+            }
+    </style>
+    </head>
+    <body>
+        <div id="gameContainer">
+            <div id="startScreen">
+                <h1>La Llama Che: Revolution</h1>
+                <p>Use ← → to move, SPACE to shoot love and wisdom</p>
+                <button class="start-button" onclick="startGame()">Start Revolution</button>
+            </div>
+            <div id="llamaChe">🦙</div>
+            <div id="score">Peace: 0</div>
+            <div id="health">❤️❤️❤️</div>
+            <div id="gameOver">
+                <div>Revolution Continues!</div>
+                <button class="start-button" onclick="resetGame()">Try Again</button>
+            </div>
+        
+            <div id="powerMeter"><div id="powerFill"></div></div>
+            <div class="level-indicator">Level 1</div>
+    </div>
+        
+        <script>
+            const llamaChe = document.getElementById('llamaChe');
+            const gameContainer = document.getElementById('gameContainer');
+            const scoreElement = document.getElementById('score');
+            const healthElement = document.getElementById('health');
+            const gameOverScreen = document.getElementById('gameOver');
+            const startScreen = document.getElementById('startScreen');
+            
+            let score = 0;
+            let health = 3;
+            let gameActive = false;
+            let llamaPosition = 370;
+            let enemies = [];
+            let projectiles = [];
+            
+            const enemyTypes = [
+                { text: "FAKE 5AM SHIFT", emoji: "⏰" },
+                { text: "ILLEGAL EVICTION", emoji: "🏠" },
+                { text: "UNFAIR FIRING", emoji: "📄" },
+                { text: "GHOST SCHEDULE", emoji: "👻" },
+                { text: "WAGE THEFT", emoji: "💸" }
+            ];
+            
+            function startGame() {
+                startScreen.style.display = 'none';
+                gameActive = true;
+                spawnEnemies();
+                gameLoop();
+            }
+            
+            function resetGame() {
+                score = 0;
+                health = 3;
+                enemies = [];
+                projectiles = [];
+                scoreElement.textContent = `Peace: ${score}`;
+                healthElement.textContent = '❤️'.repeat(health);
+                gameOverScreen.style.display = 'none';
+                gameActive = true;
+                spawnEnemies();
+            }
+            
+            function spawnEnemies() {
+                if (!gameActive) return;
+                
+                const enemy = document.createElement('div');
+                enemy.className = 'enemy';
+                const enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+                enemy.innerHTML = `
+                    ${enemyType.emoji}
+                    <div class="enemy-text">${enemyType.text}</div>
+                `;
+                enemy.style.left = Math.random() * (gameContainer.offsetWidth - 50) + 'px';
+                enemy.style.top = '0px';
+                gameContainer.appendChild(enemy);
+                enemies.push(enemy);
+                
+                setTimeout(spawnEnemies, 2000);
+            }
+            
+            function moveEnemies() {
+                enemies.forEach((enemy, index) => {
+                    const top = parseInt(enemy.style.top) || 0;
+                    if (top > gameContainer.offsetHeight) {
+                        enemy.remove();
+                        enemies.splice(index, 1);
+                        health--;
+                        healthElement.textContent = '❤️'.repeat(health);
+                        if (health <= 0) endGame();
+                    } else {
+                        enemy.style.top = (top + 2) + 'px';
+                    }
+                });
+            }
+            
+            function moveProjectiles() {
+                projectiles.forEach((projectile, index) => {
+                    const top = parseInt(projectile.style.top) || 0;
+                    if (top < 0) {
+                        projectile.remove();
+                        projectiles.splice(index, 1);
+                    } else {
+                        projectile.style.top = (top - 5) + 'px';
+                        checkCollisions(projectile);
+                    }
+                });
+            }
+            
+            function checkCollisions(projectile) {
+                const projectileRect = projectile.getBoundingClientRect();
+                
+                enemies.forEach((enemy, index) => {
+                    const enemyRect = enemy.getBoundingClientRect();
+                    
+                    if (projectileRect.left < enemyRect.right &&
+                        projectileRect.right > enemyRect.left &&
+                        projectileRect.top < enemyRect.bottom &&
+                        projectileRect.bottom > enemyRect.top) {
+                        
+                        createExplosion(enemy.offsetLeft, enemy.offsetTop);
+                        enemy.remove();
+                        enemies.splice(index, 1);
+                        projectile.remove();
+                        projectiles.splice(projectiles.indexOf(projectile), 1);
+                        score += 100;
+                        scoreElement.textContent = `Peace: ${score}`;
+                    }
+                });
+            }
+            
+            function createExplosion(x, y) {
+                const explosion = document.createElement('div');
+                explosion.className = 'explosion';
+                explosion.textContent = '💚';
+                explosion.style.left = x + 'px';
+                explosion.style.top = y + 'px';
+                gameContainer.appendChild(explosion);
+                
+                explosion.addEventListener('animationend', () => explosion.remove());
+            }
+            
+            function shoot() {
+                if (!gameActive) return;
+                
+                const projectile = document.createElement('div');
+                projectile.className = 'projectile';
+                projectile.textContent = '💚';
+                projectile.style.left = (llamaPosition + 20) + 'px';
+                projectile.style.top = (gameContainer.offsetHeight - 80) + 'px';
+                gameContainer.appendChild(projectile);
+                projectiles.push(projectile);
+            }
+            
+            function endGame() {
+                gameActive = false;
+                gameOverScreen.style.display = 'block';
+            }
+            
+            function gameLoop() {
+                if (!gameActive) return;
+                moveEnemies();
+                moveProjectiles();
+                requestAnimationFrame(gameLoop);
+            }
+            
+            
+            let level = 1;
+            let powerMeter = 0;
+            let combo = 0;
+            let lastKillTime = 0;
+            
+            function updatePowerMeter() {
+                powerMeter = Math.min(100, powerMeter + 5);
+                document.getElementById('powerFill').style.width = powerMeter + '%';
+            }
+            
+            function activatePower() {
+                if (powerMeter >= 100) {
+                    powerMeter = 0;
+                    document.getElementById('powerFill').style.width = '0%';
+                    
+                    // Create alpaca shield effect
+                    const shield = document.createElement('div');
+                    shield.className = 'power-up';
+                    shield.innerHTML = '🦙';
+                    shield.style.left = llamaPosition + 'px';
+                    shield.style.bottom = '80px';
+                    gameContainer.appendChild(shield);
+                    
+                    // Clear all enemies
+                    enemies.forEach(enemy => {
+                        createExplosion(enemy.offsetLeft, enemy.offsetTop);
+                        enemy.remove();
+                        score += 150;
+                    });
+                    enemies = [];
+                    scoreElement.textContent = `Peace: ${score}`;
+                    
+                    setTimeout(() => shield.remove(), 1000);
+                }
+            }
+            
+            function showCombo(x, y) {
+                const now = Date.now();
+                if (now - lastKillTime < 1000) {
+                    combo++;
+                } else {
+                    combo = 1;
+                }
+                lastKillTime = now;
+                
+                if (combo > 1) {
+                    const comboText = document.createElement('div');
+                    comboText.className = 'combo-text';
+                    comboText.textContent = `${combo}x Combo!`;
+                    comboText.style.left = x + 'px';
+                    comboText.style.top = y + 'px';
+                    gameContainer.appendChild(comboText);
+                    
+                    setTimeout(() => comboText.remove(), 1000);
+                    
+                    // Add bonus points for combos
+                    score += combo * 50;
+                    scoreElement.textContent = `Peace: ${score}`;
+                }
+            }
+            
+            function checkLevelUp() {
+                const newLevel = Math.floor(score / 1000) + 1;
+                if (newLevel > level) {
+                    level = newLevel;
+                    document.querySelector('.level-indicator').textContent = `Level ${level}`;
+                    // Increase difficulty
+                    spawnEnemies();
+                }
+            }
+            
+            // Enhance the original functions
+            const originalCheckCollisions = checkCollisions;
+            checkCollisions = function(projectile) {
+                const projectileRect = projectile.getBoundingClientRect();
+                
+                enemies.forEach((enemy, index) => {
+                    const enemyRect = enemy.getBoundingClientRect();
+                    
+                    if (projectileRect.left < enemyRect.right &&
+                        projectileRect.right > enemyRect.left &&
+                        projectileRect.top < enemyRect.bottom &&
+                        projectileRect.bottom > enemyRect.top) {
+                        
+                        createExplosion(enemy.offsetLeft, enemy.offsetTop);
+                        enemy.remove();
+                        enemies.splice(index, 1);
+                        projectile.remove();
+                        projectiles.splice(projectiles.indexOf(projectile), 1);
+                        
+                        showCombo(enemy.offsetLeft, enemy.offsetTop);
+                        updatePowerMeter();
+                        checkLevelUp();
+                    }
+                });
+            }
+    
+            document.addEventListener('keydown', (e) => {
+                if (!gameActive) return;
+                
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        llamaPosition = Math.max(0, llamaPosition - 20);
+                        llamaChe.style.left = llamaPosition + 'px';
+                        break;
+                    case 'ArrowRight':
+                        llamaPosition = Math.min(gameContainer.offsetWidth - 60, llamaPosition + 20);
+                        llamaChe.style.left = llamaPosition + 'px';
+                        break;
+                    case ' ':
+                        shoot();
+                        break;
+                    
+                    case 'Shift':
+                        activatePower();
+                        break;
+    
+                }
+            });
+        </script>
+    
+    
+    </body></html>
